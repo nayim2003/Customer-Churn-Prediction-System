@@ -111,3 +111,7 @@ The notebook establishes a coherent predictive pipeline in which:
 The strongest recurring signal across the analysis is the relationship between **customer lifecycle/tenure, contract structure, service/payment configuration and churn**.
 
 The final model should therefore be interpreted as a **risk-ranking and classification tool**, not as a causal model of why customers leave.
+
+## ***Md. Nayim Howlader***
+### ***BSc (Honours), Department of Statistics***
+### ***Dhaka College, Dhaka***
