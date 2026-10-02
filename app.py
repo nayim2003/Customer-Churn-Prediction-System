@@ -2,8 +2,14 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import joblib
-import shap
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+
+try:
+    import shap
+except Exception:
+    shap = None
 from pathlib import Path
 
 
@@ -493,6 +499,8 @@ def create_customer(
 # =========================================================
 
 with st.sidebar:
+
+    st.caption("✅ App version: v2")
 
     st.title(
         "📊 ChurnIQ"
@@ -1218,7 +1226,7 @@ if predict_button:
         # SHAP EXPLANATION OBJECT
         # =============================================
 
-        shap_explanation = shap.Explanation(
+        shap_explanation = None if shap is None else shap.Explanation(
 
             values=shap_values,
 
@@ -1232,134 +1240,154 @@ if predict_button:
 
 
         # =============================================
-        # PROFESSIONAL SHAP WATERFALL
+        # SHAP CHART (native Streamlit/Altair - always renders)
         # =============================================
 
-        fig = plt.figure(
-            figsize=(11, 8)
+        import altair as alt
+
+        chart_df = pd.DataFrame(
+            {
+                "Feature": [
+                    str(f) for f in shap_feature_names
+                ],
+                "SHAP Value": shap_values
+            }
         )
 
+        chart_df["Abs"] = (
+            chart_df["SHAP Value"].abs()
+        )
 
-        try:
-
-            shap.plots.waterfall(
-                shap_explanation,
-                max_display=15,
-                show=False
+        chart_df = (
+            chart_df
+            .sort_values(
+                "Abs",
+                ascending=False
             )
+            .head(15)
+        )
 
-        except Exception:
+        chart_df["Direction"] = np.where(
+            chart_df["SHAP Value"] > 0,
+            "Toward Churn",
+            "Away From Churn"
+        )
 
-            # Fallback: simple bar chart of top 15 SHAP values
-
-            plt.close(fig)
-
-            fig = plt.figure(
-                figsize=(11, 8)
+        shap_chart = (
+            alt.Chart(chart_df)
+            .mark_bar()
+            .encode(
+                x=alt.X(
+                    "SHAP Value:Q",
+                    title="SHAP value (impact on churn)"
+                ),
+                y=alt.Y(
+                    "Feature:N",
+                    sort=alt.EncodingSortField(
+                        field="Abs",
+                        order="descending"
+                    ),
+                    title=None
+                ),
+                color=alt.Color(
+                    "Direction:N",
+                    scale=alt.Scale(
+                        domain=[
+                            "Toward Churn",
+                            "Away From Churn"
+                        ],
+                        range=[
+                            "#ef4444",
+                            "#3b82f6"
+                        ]
+                    ),
+                    legend=alt.Legend(
+                        title=None,
+                        orient="bottom"
+                    )
+                ),
+                tooltip=[
+                    "Feature",
+                    alt.Tooltip(
+                        "SHAP Value:Q",
+                        format=".4f"
+                    ),
+                    "Direction"
+                ]
             )
-
-            top_idx = np.argsort(
-                np.abs(shap_values)
-            )[-15:]
-
-            bar_colors = [
-                "#ef4444" if v > 0 else "#3b82f6"
-                for v in shap_values[top_idx]
-            ]
-
-            plt.barh(
-                [str(shap_feature_names[i]) for i in top_idx],
-                shap_values[top_idx],
-                color=bar_colors
+            .properties(
+                width="container",
+                height=440,
+                title="SHAP Explanation — Customer Churn Prediction"
             )
-
-            plt.xlabel(
-                "SHAP value",
-                color="#cbd5e1"
+            .configure(
+                background="#111827"
             )
+            .configure_axis(
+                labelColor="#cbd5e1",
+                titleColor="#cbd5e1",
+                gridColor="#263244",
+                domainColor="#334155"
+            )
+            .configure_legend(
+                labelColor="#cbd5e1"
+            )
+            .configure_title(
+                color="#f8fafc",
+                fontSize=16
+            )
+            .configure_view(
+                strokeWidth=0
+            )
+        )
+
+        st.altair_chart(
+            shap_chart,
+            theme=None
+        )
 
 
         # =============================================
-        # STYLE SHAP FIGURE
+        # OPTIONAL: CLASSIC SHAP WATERFALL
         # =============================================
 
-        ax = plt.gca()
+        with st.expander(
+            "📉 View classic SHAP waterfall plot"
+        ):
 
+            try:
 
-        ax.set_facecolor(
-            "#111827"
-        )
+                plt.figure(
+                    figsize=(10, 7)
+                )
 
+                shap.plots.waterfall(
+                    shap_explanation,
+                    max_display=15,
+                    show=False
+                )
 
-        fig.patch.set_facecolor(
-            "#111827"
-        )
+                waterfall_fig = plt.gcf()
 
+                st.pyplot(
+                    waterfall_fig
+                )
 
-        # Axis labels
+                plt.close(
+                    waterfall_fig
+                )
 
-        ax.tick_params(
-            colors="#e2e8f0"
-        )
+            except Exception as waterfall_error:
 
+                st.warning(
+                    "Waterfall plot could not be drawn "
+                    "(the chart above is unaffected)."
+                )
 
-        for label in ax.get_xticklabels():
+                st.code(
+                    str(waterfall_error)
+                )
 
-            label.set_color(
-                "#cbd5e1"
-            )
-
-
-        for label in ax.get_yticklabels():
-
-            label.set_color(
-                "#f8fafc"
-            )
-
-
-        ax.set_title(
-            "SHAP Explanation — Customer Churn Prediction",
-            color="#f8fafc",
-            fontsize=16,
-            fontweight="bold",
-            pad=15
-        )
-
-
-        # Spines
-
-        ax.spines[
-            "top"
-        ].set_visible(False)
-
-        ax.spines[
-            "right"
-        ].set_visible(False)
-
-
-        ax.spines[
-            "left"
-        ].set_color(
-            "#334155"
-        )
-
-        ax.spines[
-            "bottom"
-        ].set_color(
-            "#334155"
-        )
-
-
-        plt.tight_layout()
-
-
-        st.pyplot(
-            fig,
-            use_container_width=True
-        )
-
-
-        plt.close(fig)
 
 
         st.caption(
