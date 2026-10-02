@@ -146,6 +146,7 @@ The notebook reloads the bundle and verifies the constructed customer's predicti
 **Model:** Tuned XGBoost  
 **Decision threshold:** 0.45
 
+------------------
 # ***Md. Nayim Howlader***
 ## ***BSc (Honours), Department of Statistics,***
 ## ***Dhaka College, Dhaka***
