@@ -25,10 +25,12 @@ telco-customer-churn/
 │   ├── evaluation.py
 │   └── prediction.py
 ├── models/
-├── outputs/
-│   ├── figures/
-│   ├── tables/
-│   └── predictions/
+│   ├── churn_model.pkl
+│   ├── churn_pipeline.pkl
+│   ├── encoder.pkl
+│   ├── feature_names.pkl
+│   └── scaler.pkl
+├── app.py
 └── reports/
     └── Telco_Customer_Churn_Report.md
 ```
