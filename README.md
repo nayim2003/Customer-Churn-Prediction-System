@@ -1,3 +1,5 @@
+# Telco Customer Churn Prediction — Professional Data Science Project
+
 End-to-end customer churn prediction using the IBM Telco Customer Churn dataset.
 
 ## Workflow
