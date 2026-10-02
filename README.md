@@ -145,3 +145,7 @@ The notebook reloads the bundle and verifies the constructed customer's predicti
 **Project:** Customer Churn Prediction System using the IBM Telco Customer Churn dataset  
 **Model:** Tuned XGBoost  
 **Decision threshold:** 0.45
+
+# ***Md. Nayim Howlader***
+## ***BSc (Honours), Department of Statistics,***
+## ***Dhaka College, Dhaka***
