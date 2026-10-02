@@ -1,7 +1,35 @@
-# Telco Customer Churn Prediction — Findings & Decisions
+nd-to-end customer churn prediction using the IBM Telco Customer Churn dataset.
 
-## Project overview
-An end-to-end customer churn prediction project using the IBM Telco Customer Churn dataset. The goal is to estimate whether an existing customer is likely to leave, produce a churn probability, and support customer-retention review.
+## Workflow
+
+Business Problem → Data Loading → Data Audit → Cleaning → EDA → Statistical Testing → Feature Engineering → Stratified Split → Preprocessing → Baseline Models → Cross-Validation → Hyperparameter Tuning → SMOTENC → Balanced Models → Threshold Optimization → Final Evaluation → SHAP → New Customer Prediction → Model Export
+
+## Repository structure
+
+```text
+telco-customer-churn/
+├── README.md
+├── requirements.txt
+├── .gitignore
+├── data/
+│   ├── raw/
+│   └── processed/
+├── notebooks/
+│   └── Telco_Customer_Churn_Professional_Report_v2.ipynb
+├── src/
+│   ├── data_preprocessing.py
+│   ├── feature_engineering.py
+│   ├── modeling.py
+│   ├── evaluation.py
+│   └── prediction.py
+├── models/
+├── outputs/
+│   ├── figures/
+│   ├── tables/
+│   └── predictions/
+└── reports/
+    └── Telco_Customer_Churn_Report.md
+```
 
 ## Dataset
 - **Source:** [Kaggle — Telco Customer Churn (IBM)](https://www.kaggle.com/datasets/yeanzc/telco-customer-churn-ibm-dataset)
@@ -12,7 +40,6 @@ An end-to-end customer churn prediction project using the IBM Telco Customer Chu
 ## Processed Data
 - [`Datasets/Processed/Processed_Train.csv`](Datasets/Processed/Processed_Train.csv)
 - [`Datasets/Processed/Processed_Test.csv`](Datasets/Processed/Processed_Test.csv)
-- 
 
 ## Analytical and modeling findings
 
@@ -86,6 +113,20 @@ The bundle contains:
 - `encoder`
 - `feature_names`
 - `threshold`
+
+## Final candidate reported by the notebook
+
+Balanced Tuned XGBoost, evaluated on an untouched test set with an OOF-selected threshold of 0.45.
+
+- Accuracy ≈ 0.769
+- Precision ≈ 0.553
+- Recall ≈ 0.655
+- F1 ≈ 0.600
+- ROC-AUC ≈ 0.819
+- PR-AUC ≈ 0.614
+
+These values are descriptive of this notebook's evaluation and should not be treated as guarantees on future data.
+
 
 The notebook reloads the bundle and verifies the constructed customer's prediction again (76.52% churn probability, threshold 0.45).
 
