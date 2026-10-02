@@ -1026,19 +1026,48 @@ if predict_button:
         # SHAP CALCULATION
         # =============================================
 
-        if not shap_ready:
+        raw_shap = None
+        contrib_base = None
 
-            raise RuntimeError(
-                "SHAP explainer could not be initialized.\n\n"
-                + str(shap_init_error)
+        if shap_ready:
+
+            try:
+
+                raw_shap = (
+                    explainer.shap_values(
+                        customer_transformed
+                    )
+                )
+
+            except Exception:
+
+                raw_shap = None
+
+
+        if raw_shap is None:
+
+            # Fallback: native XGBoost SHAP contributions
+            # (works even when shap/xgboost versions mismatch)
+
+            import xgboost as xgb
+
+            contribs = (
+                xgb_model
+                .get_booster()
+                .predict(
+                    xgb.DMatrix(
+                        customer_transformed
+                    ),
+                    pred_contribs=True,
+                    validate_features=False
+                )
             )
 
+            raw_shap = contribs[:, :-1]
 
-        raw_shap = (
-            explainer.shap_values(
-                customer_transformed
+            contrib_base = float(
+                contribs[0, -1]
             )
-        )
 
 
         # =============================================
@@ -1130,6 +1159,8 @@ if predict_button:
 
         expected_value = (
             explainer.expected_value
+            if explainer is not None
+            else 0.0
         )
 
 
@@ -1160,6 +1191,11 @@ if predict_button:
             base_value = float(
                 expected_value
             )
+
+
+        if contrib_base is not None:
+
+            base_value = contrib_base
 
 
         # =============================================
@@ -1204,91 +1240,127 @@ if predict_button:
         )
 
 
-        shap.plots.waterfall(
-            shap_explanation,
-            max_display=15,
-            show=False
-        )
+        try:
+
+            shap.plots.waterfall(
+                shap_explanation,
+                max_display=15,
+                show=False
+            )
+
+        except Exception:
+
+            # Fallback: simple bar chart of top 15 SHAP values
+
+            plt.close(fig)
+
+            fig = plt.figure(
+                figsize=(11, 8)
+            )
+
+            top_idx = np.argsort(
+                np.abs(shap_values)
+            )[-15:]
+
+            bar_colors = [
+                "#ef4444" if v > 0 else "#3b82f6"
+                for v in shap_values[top_idx]
+            ]
+
+            plt.barh(
+                [str(shap_feature_names[i]) for i in top_idx],
+                shap_values[top_idx],
+                color=bar_colors
+            )
+
+            plt.xlabel(
+                "SHAP value",
+                color="#cbd5e1"
+            )
 
 
         # =============================================
         # STYLE SHAP FIGURE
         # =============================================
 
-        
-                fig, ax = plt.subplots(
-                    figsize=(12, 6)
-                )
+        ax = plt.gca()
 
 
-                fig.patch.set_facecolor(
-                    "#111827"
-                )
-
-                ax.set_facecolor(
-                    "#111827"
-                )
+        ax.set_facecolor(
+            "#111827"
+        )
 
 
-                plot_importance = (
-                    importance_df
-                    .sort_values(
-                        "Importance"
-                    )
-                )
+        fig.patch.set_facecolor(
+            "#111827"
+        )
 
 
-                ax.barh(
-                    plot_importance[
-                        "Feature"
-                    ],
-                    plot_importance[
-                        "Importance"
-                    ],
-                    color="#3b82f6"
-                )
+        # Axis labels
+
+        ax.tick_params(
+            colors="#e2e8f0"
+        )
 
 
-                ax.set_title(
-                    "Model Feature Importance",
-                    color="#f8fafc",
-                    fontsize=17,
-                    fontweight="bold",
-                    fontfamily="Times New Roman"
-                )
+        for label in ax.get_xticklabels():
+
+            label.set_color(
+                "#cbd5e1"
+            )
 
 
-                ax.tick_params(
-                    colors="#e2e8f0"
-                )
+        for label in ax.get_yticklabels():
+
+            label.set_color(
+                "#f8fafc"
+            )
 
 
-                ax.spines[
-                    "top"
-                ].set_visible(False)
-
-                ax.spines[
-                    "right"
-                ].set_visible(False)
-
-                ax.spines[
-                    "left"
-                ].set_visible(False)
-
-                ax.spines[
-                    "bottom"
-                ].set_color(
-                    "#334155"
-                )
+        ax.set_title(
+            "SHAP Explanation — Customer Churn Prediction",
+            color="#f8fafc",
+            fontsize=16,
+            fontweight="bold",
+            pad=15
+        )
 
 
-                plt.tight_layout()
+        # Spines
+
+        ax.spines[
+            "top"
+        ].set_visible(False)
+
+        ax.spines[
+            "right"
+        ].set_visible(False)
 
 
-                st.pyplot(
-                    fig,
-                    use_container_width=True
-                )
+        ax.spines[
+            "left"
+        ].set_color(
+            "#334155"
+        )
+
+        ax.spines[
+            "bottom"
+        ].set_color(
+            "#334155"
+        )
+
+
+        plt.tight_layout()
+
+
+        st.pyplot(
+            fig,
+            use_container_width=True
+        )
+
+
+        plt.close(fig)
+
 
         st.caption(
             "Positive SHAP contributions push the model "
@@ -1445,13 +1517,7 @@ if predict_button:
         )
 
 
-        with st.expander(
-            "🔧 Technical Details"
-        ):
-
-            st.code(
-                str(e)
-            )
+        st.exception(e)
 
 
 # =========================================================
