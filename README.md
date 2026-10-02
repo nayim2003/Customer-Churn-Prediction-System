@@ -1,4 +1,4 @@
-nd-to-end customer churn prediction using the IBM Telco Customer Churn dataset.
+End-to-end customer churn prediction using the IBM Telco Customer Churn dataset.
 
 ## Workflow
 
