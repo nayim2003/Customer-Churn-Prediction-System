@@ -10,7 +10,7 @@ An end-to-end customer churn prediction project using the IBM Telco Customer Chu
 - **Target:** `Churn` (`Yes` / `No`)
 - **Feature domains:** customer profile, tenure, subscribed services, contract, billing, and payment method.
 ## Processed Data
-- Datasets/Processed/Processed_Train.csv
+- [`Datasets/Processed/Processed_Train.csv`](Datasets/Processed/Processed_Train.csv)
 - Datasets/Processed/Processed_Test.csv
 
 ## Analytical and modeling findings
