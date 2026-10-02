@@ -4,12 +4,11 @@ import numpy as np
 import joblib
 import shap
 import matplotlib.pyplot as plt
-import textwrap
 from pathlib import Path
 
 
 # =========================================================
-# PAGE CONFIGURATION
+# PAGE CONFIG
 # =========================================================
 
 st.set_page_config(
@@ -21,423 +20,163 @@ st.set_page_config(
 
 
 # =========================================================
-# GLOBAL CSS
+# PROFESSIONAL CSS
+# NOTE:
+# No custom HTML <div> is used anywhere in the UI.
 # =========================================================
 
 st.markdown(
-    textwrap.dedent(
-        """
-        <style>
-
-        /* =================================================
-           GLOBAL
-           ================================================= */
-
-        .stApp {
-            background: #f5f7fb;
-        }
-
-        .block-container {
-            max-width: 1380px;
-            padding-top: 2rem;
-            padding-bottom: 4rem;
-        }
-
-        h1, h2, h3, h4 {
-            color: #172033 !important;
-        }
-
-        p {
-            color: #526071;
-        }
-
-        hr {
-            border: none;
-            border-top: 1px solid #e4e8ef;
-            margin: 1.5rem 0;
-        }
-
-
-        /* =================================================
-           SIDEBAR
-           ================================================= */
-
-        section[data-testid="stSidebar"] {
-            background: #111827;
-            border-right: 1px solid #202938;
-        }
-
-        section[data-testid="stSidebar"] * {
-            color: #e5e7eb !important;
-        }
-
-        .sidebar-brand {
-            padding: 10px 5px 25px 5px;
-        }
-
-        .sidebar-brand-title {
-            font-size: 24px;
-            font-weight: 800;
-            color: #ffffff !important;
-            margin-bottom: 4px;
-        }
-
-        .sidebar-brand-subtitle {
-            font-size: 13px;
-            color: #9ca3af !important;
-        }
-
-        .sidebar-card {
-            background: #1b2433;
-            border: 1px solid #2a3547;
-            border-radius: 12px;
-            padding: 15px;
-            margin-top: 15px;
-        }
-
-        .sidebar-card-title {
-            font-size: 13px;
-            font-weight: 700;
-            color: #ffffff !important;
-            margin-bottom: 8px;
-        }
-
-        .sidebar-card-text {
-            font-size: 12px;
-            line-height: 1.6;
-            color: #aeb8c7 !important;
-        }
-
-
-        /* =================================================
-           HERO
-           ================================================= */
-
-        .hero {
-            background: linear-gradient(
-                135deg,
-                #111827 0%,
-                #1d3557 55%,
-                #244b78 100%
-            );
-            border-radius: 18px;
-            padding: 35px 40px;
-            margin-bottom: 30px;
-            box-shadow: 0 15px 35px rgba(17, 24, 39, 0.15);
-        }
-
-        .hero-badge {
-            display: inline-block;
-            background: rgba(255,255,255,0.10);
-            border: 1px solid rgba(255,255,255,0.15);
-            color: #dbeafe !important;
-            padding: 6px 12px;
-            border-radius: 999px;
-            font-size: 12px;
-            font-weight: 700;
-            margin-bottom: 14px;
-        }
-
-        .hero-title {
-            color: #ffffff !important;
-            font-size: 34px;
-            font-weight: 800;
-            margin: 0;
-        }
-
-        .hero-subtitle {
-            color: #cbd5e1 !important;
-            font-size: 15px;
-            margin-top: 10px;
-            margin-bottom: 0;
-        }
-
-
-        /* =================================================
-           SECTION HEADERS
-           ================================================= */
-
-        .section-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 28px 0 8px 0;
-        }
-
-        .section-icon {
-            width: 34px;
-            height: 34px;
-            border-radius: 9px;
-            background: #e8f0ff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 17px;
-        }
-
-        .section-title {
-            font-size: 20px;
-            font-weight: 750;
-            color: #172033 !important;
-        }
-
-        .section-description {
-            font-size: 13px;
-            color: #697586 !important;
-            margin-bottom: 18px;
-        }
-
-
-        /* =================================================
-           INPUT LABELS
-           ================================================= */
-
-        div[data-testid="stWidgetLabel"] p {
-            color: #273449 !important;
-            font-weight: 650 !important;
-            font-size: 13px !important;
-            opacity: 1 !important;
-        }
-
-        div[data-testid="stSelectbox"] label p,
-        div[data-testid="stNumberInput"] label p {
-            color: #273449 !important;
-            font-weight: 650 !important;
-            opacity: 1 !important;
-        }
-
-
-        /* =================================================
-           SELECTBOX
-           ================================================= */
-
-        div[data-baseweb="select"] > div {
-            background: #ffffff !important;
-            border: 1px solid #d8dee8 !important;
-            border-radius: 8px !important;
-            min-height: 42px;
-        }
-
-        div[data-baseweb="select"] > div:hover {
-            border-color: #7098d8 !important;
-        }
-
-        div[data-baseweb="select"] span {
-            color: #172033 !important;
-        }
-
-
-        /* =================================================
-           NUMBER INPUT
-           ================================================= */
-
-        div[data-testid="stNumberInput"] input {
-            background: #ffffff !important;
-            color: #172033 !important;
-            border: 1px solid #d8dee8 !important;
-            border-radius: 8px !important;
-            min-height: 42px;
-        }
-
-        div[data-testid="stNumberInput"] input:focus {
-            border-color: #4f7fd6 !important;
-            box-shadow: 0 0 0 1px #4f7fd6 !important;
-        }
-
-
-        /* =================================================
-           PREDICTION BUTTON
-           ================================================= */
-
-        div.stButton > button {
-            background: linear-gradient(
-                135deg,
-                #1d4ed8,
-                #2563eb
-            ) !important;
-
-            color: #ffffff !important;
-            border: none !important;
-            border-radius: 10px !important;
-            min-height: 50px !important;
-            font-size: 15px !important;
-            font-weight: 700 !important;
-            box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22);
-            transition: all 0.2s ease;
-        }
-
-        div.stButton > button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.28);
-        }
-
-
-        /* =================================================
-           KPI CARDS
-           ================================================= */
-
-        .kpi-card {
-            background: #ffffff;
-            border: 1px solid #e2e7ef;
-            border-radius: 14px;
-            padding: 20px;
-            min-height: 115px;
-            box-shadow: 0 5px 15px rgba(15, 23, 42, 0.04);
-        }
-
-        .kpi-label {
-            color: #697586 !important;
-            font-size: 12px;
-            font-weight: 650;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .kpi-value {
-            color: #172033 !important;
-            font-size: 26px;
-            font-weight: 800;
-            margin-top: 8px;
-        }
-
-        .kpi-small {
-            color: #7b8796 !important;
-            font-size: 12px;
-            margin-top: 4px;
-        }
-
-
-        /* =================================================
-           RISK CARD
-           ================================================= */
-
-        .risk-card {
-            border-radius: 14px;
-            padding: 20px 22px;
-            margin-top: 18px;
-            border: 1px solid #e2e7ef;
-            background: #ffffff;
-        }
-
-        .risk-title {
-            font-size: 13px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-            color: #697586 !important;
-        }
-
-        .risk-value {
-            font-size: 25px;
-            font-weight: 800;
-            margin-top: 5px;
-        }
-
-        .risk-high {
-            color: #dc2626 !important;
-        }
-
-        .risk-low {
-            color: #15803d !important;
-        }
-
-
-        /* =================================================
-           PROGRESS BAR
-           ================================================= */
-
-        .progress-container {
-            width: 100%;
-            height: 10px;
-            background: #e7ebf1;
-            border-radius: 999px;
-            overflow: hidden;
-            margin-top: 10px;
-        }
-
-        .progress-bar {
-            height: 100%;
-            border-radius: 999px;
-            background: linear-gradient(
-                90deg,
-                #22c55e,
-                #f59e0b,
-                #ef4444
-            );
-        }
-
-
-        /* =================================================
-           SHAP CARD
-           ================================================= */
-
-        .shap-card {
-            background: #ffffff;
-            border: 1px solid #e2e7ef;
-            border-radius: 14px;
-            padding: 20px;
-            box-shadow: 0 5px 15px rgba(15, 23, 42, 0.04);
-        }
-
-
-        /* =================================================
-           INFO CARD
-           ================================================= */
-
-        .info-card {
-            background: #f8fafc;
-            border: 1px solid #e4e8ef;
-            border-radius: 12px;
-            padding: 15px 18px;
-            margin-top: 12px;
-        }
-
-        .info-title {
-            font-weight: 700;
-            color: #273449 !important;
-            font-size: 13px;
-        }
-
-        .info-text {
-            font-size: 12px;
-            color: #697586 !important;
-            line-height: 1.6;
-            margin-top: 5px;
-        }
-
-
-        /* =================================================
-           EXPANDER
-           ================================================= */
-
-        details {
-            background: #ffffff !important;
-            border: 1px solid #e2e7ef !important;
-            border-radius: 12px !important;
-        }
-
-
-        /* =================================================
-           FOOTER
-           ================================================= */
-
-        .footer {
-            text-align: center;
-            color: #8a94a3 !important;
-            font-size: 12px;
-            padding-top: 35px;
-            padding-bottom: 10px;
-        }
-
-        </style>
-        """
-    ),
+    """
+    <style>
+
+    /* ---------- APP ---------- */
+
+    .stApp {
+        background-color: #f5f7fb;
+    }
+
+    .block-container {
+        max-width: 1400px;
+        padding-top: 2rem;
+        padding-bottom: 4rem;
+    }
+
+
+    /* ---------- SIDEBAR ---------- */
+
+    section[data-testid="stSidebar"] {
+        background-color: #111827;
+    }
+
+    section[data-testid="stSidebar"] * {
+        color: #e5e7eb;
+    }
+
+    section[data-testid="stSidebar"] h1,
+    section[data-testid="stSidebar"] h2,
+    section[data-testid="stSidebar"] h3 {
+        color: white !important;
+    }
+
+
+    /* ---------- HEADINGS ---------- */
+
+    h1 {
+        color: #172033 !important;
+        font-weight: 800 !important;
+    }
+
+    h2 {
+        color: #172033 !important;
+        font-weight: 750 !important;
+    }
+
+    h3 {
+        color: #172033 !important;
+        font-weight: 700 !important;
+    }
+
+
+    /* ---------- INPUT LABELS ---------- */
+
+    label p {
+        color: #334155 !important;
+        font-weight: 600 !important;
+    }
+
+
+    /* ---------- SELECTBOX ---------- */
+
+    div[data-baseweb="select"] > div {
+        background-color: white !important;
+        border: 1px solid #d8dee8 !important;
+        border-radius: 8px !important;
+    }
+
+    div[data-baseweb="select"] span {
+        color: #172033 !important;
+    }
+
+
+    /* ---------- NUMBER INPUT ---------- */
+
+    div[data-testid="stNumberInput"] input {
+        background-color: white !important;
+        color: #172033 !important;
+        border: 1px solid #d8dee8 !important;
+        border-radius: 8px !important;
+    }
+
+
+    /* ---------- BUTTON ---------- */
+
+    div.stButton > button {
+        width: 100%;
+        min-height: 50px;
+        border-radius: 10px;
+        border: none;
+        font-weight: 700;
+        font-size: 15px;
+        background: linear-gradient(
+            135deg,
+            #1d4ed8,
+            #2563eb
+        );
+        color: white;
+    }
+
+    div.stButton > button:hover {
+        background: linear-gradient(
+            135deg,
+            #1e40af,
+            #1d4ed8
+        );
+        color: white;
+    }
+
+
+    /* ---------- METRICS ---------- */
+
+    div[data-testid="stMetric"] {
+        background: white;
+        border: 1px solid #e2e8f0;
+        padding: 18px;
+        border-radius: 12px;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+    }
+
+
+    /* ---------- DATAFRAME ---------- */
+
+    div[data-testid="stDataFrame"] {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+
+    /* ---------- EXPANDER ---------- */
+
+    details {
+        background: white;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+    }
+
+
+    /* ---------- DIVIDER ---------- */
+
+    hr {
+        border-color: #e2e8f0;
+    }
+
+    </style>
+    """,
     unsafe_allow_html=True
 )
 
 
 # =========================================================
-# MODEL PATH
+# PATHS
 # =========================================================
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -459,7 +198,7 @@ def load_model():
     if not MODEL_PATH.exists():
 
         raise FileNotFoundError(
-            f"Model file not found:\n{MODEL_PATH}"
+            f"Model not found: {MODEL_PATH}"
         )
 
     return joblib.load(MODEL_PATH)
@@ -482,7 +221,7 @@ try:
 except Exception as e:
 
     st.error(
-        "Unable to load the churn prediction model."
+        "Unable to load the trained model."
     )
 
     st.code(str(e))
@@ -537,7 +276,7 @@ def create_customer(
     TotalCharges
 ):
 
-    # Average charges per month
+    # Average charges
 
     AvgChargesPerMonth = (
         TotalCharges / (tenure + 1)
@@ -565,7 +304,7 @@ def create_customer(
 
     # Number of services
 
-    service_values = [
+    services = [
 
         PhoneService,
         MultipleLines,
@@ -579,80 +318,35 @@ def create_customer(
     ]
 
     NumServices = sum(
-        1
-        for value in service_values
-        if value == "Yes"
+        value == "Yes"
+        for value in services
     )
 
-
-    # Customer dataframe
 
     customer = pd.DataFrame(
         [{
             "gender": gender,
-
-            "SeniorCitizen":
-                SeniorCitizen,
-
-            "Partner":
-                Partner,
-
-            "Dependents":
-                Dependents,
-
-            "tenure":
-                tenure,
-
-            "PhoneService":
-                PhoneService,
-
-            "MultipleLines":
-                MultipleLines,
-
-            "InternetService":
-                InternetService,
-
-            "OnlineSecurity":
-                OnlineSecurity,
-
-            "OnlineBackup":
-                OnlineBackup,
-
-            "DeviceProtection":
-                DeviceProtection,
-
-            "TechSupport":
-                TechSupport,
-
-            "StreamingTV":
-                StreamingTV,
-
-            "StreamingMovies":
-                StreamingMovies,
-
-            "Contract":
-                Contract,
-
-            "PaperlessBilling":
-                PaperlessBilling,
-
-            "PaymentMethod":
-                PaymentMethod,
-
-            "MonthlyCharges":
-                MonthlyCharges,
-
-            "TotalCharges":
-                TotalCharges,
-
-            "AvgChargesPerMonth":
-                AvgChargesPerMonth,
-
-            "TenureGroup":
-                TenureGroup,
-
-            "NumServices":
-                NumServices
+            "SeniorCitizen": SeniorCitizen,
+            "Partner": Partner,
+            "Dependents": Dependents,
+            "tenure": tenure,
+            "PhoneService": PhoneService,
+            "MultipleLines": MultipleLines,
+            "InternetService": InternetService,
+            "OnlineSecurity": OnlineSecurity,
+            "OnlineBackup": OnlineBackup,
+            "DeviceProtection": DeviceProtection,
+            "TechSupport": TechSupport,
+            "StreamingTV": StreamingTV,
+            "StreamingMovies": StreamingMovies,
+            "Contract": Contract,
+            "PaperlessBilling": PaperlessBilling,
+            "PaymentMethod": PaymentMethod,
+            "MonthlyCharges": MonthlyCharges,
+            "TotalCharges": TotalCharges,
+            "AvgChargesPerMonth": AvgChargesPerMonth,
+            "TenureGroup": TenureGroup,
+            "NumServices": NumServices
         }]
     )
 
@@ -665,174 +359,83 @@ def create_customer(
 
 with st.sidebar:
 
-    st.markdown(
-        textwrap.dedent(
-            """
-            <div class="sidebar-brand">
+    st.title("📊 ChurnIQ")
 
-                <div class="sidebar-brand-title">
-                    📊 ChurnIQ
-                </div>
-
-                <div class="sidebar-brand-subtitle">
-                    Customer Analytics Platform
-                </div>
-
-            </div>
-            """
-        ),
-        unsafe_allow_html=True
+    st.caption(
+        "Customer Analytics & Churn Prediction"
     )
 
+    st.divider()
 
-    st.markdown(
-        textwrap.dedent(
-            """
-            <div class="sidebar-card">
+    st.subheader("🤖 Model")
 
-                <div class="sidebar-card-title">
-                    🤖 Model
-                </div>
-
-                <div class="sidebar-card-text">
-                    XGBoost classification model with
-                    engineered customer features.
-                </div>
-
-            </div>
-            """
-        ),
-        unsafe_allow_html=True
+    st.write(
+        "XGBoost classification model with "
+        "engineered customer features."
     )
 
+    st.divider()
 
-    st.markdown(
-        textwrap.dedent(
-            """
-            <div class="sidebar-card">
+    st.subheader("🔍 Explainability")
 
-                <div class="sidebar-card-title">
-                    🔍 Explainability
-                </div>
-
-                <div class="sidebar-card-text">
-                    SHAP-based feature contribution
-                    analysis explains individual predictions.
-                </div>
-
-            </div>
-            """
-        ),
-        unsafe_allow_html=True
+    st.write(
+        "SHAP TreeExplainer is used to explain "
+        "individual predictions."
     )
 
+    st.divider()
+
+    st.subheader("📋 How to use")
 
     st.markdown(
-        textwrap.dedent(
-            """
-            <div class="sidebar-card">
+        """
+        **1.** Enter customer information.
 
-                <div class="sidebar-card-title">
-                    📋 How to use
-                </div>
+        **2.** Enter billing information.
 
-                <div class="sidebar-card-text">
-                    1. Enter customer information.<br>
-                    2. Review billing details.<br>
-                    3. Click Analyze Customer Churn.<br>
-                    4. Review risk and SHAP explanation.
-                </div>
+        **3.** Click **Analyze Customer Churn**.
 
-            </div>
-            """
-        ),
-        unsafe_allow_html=True
+        **4.** Review probability and SHAP explanation.
+        """
     )
 
+    st.divider()
 
-    st.markdown(
-        textwrap.dedent(
-            """
-            <div class="sidebar-card">
-
-                <div class="sidebar-card-title">
-                    ⚠️ Note
-                </div>
-
-                <div class="sidebar-card-text">
-                    Predictions are model-based estimates
-                    and should be interpreted together
-                    with business context.
-                </div>
-
-            </div>
-            """
-        ),
-        unsafe_allow_html=True
+    st.info(
+        "Predictions are model-based estimates "
+        "and should be interpreted with business context."
     )
 
 
 # =========================================================
-# HERO
+# MAIN HEADER
 # =========================================================
 
-st.markdown(
-    textwrap.dedent(
-        """
-        <div class="hero">
-
-            <div class="hero-badge">
-                CUSTOMER ANALYTICS • MACHINE LEARNING
-            </div>
-
-            <div class="hero-title">
-                Customer Churn Prediction
-            </div>
-
-            <div class="hero-subtitle">
-                Predict customer churn probability and
-                understand the key factors influencing
-                each prediction.
-            </div>
-
-        </div>
-        """
-    ),
-    unsafe_allow_html=True
+st.title(
+    "📊 Customer Churn Prediction"
 )
 
-
-# =========================================================
-# CUSTOMER PROFILE HEADER
-# =========================================================
-
-st.markdown(
-    textwrap.dedent(
-        """
-        <div class="section-header">
-
-            <div class="section-icon">
-                👤
-            </div>
-
-            <div class="section-title">
-                Customer Profile
-            </div>
-
-        </div>
-
-        <div class="section-description">
-            Enter demographic, subscription and service information.
-        </div>
-        """
-    ),
-    unsafe_allow_html=True
+st.write(
+    "Predict customer churn probability and "
+    "understand the key factors influencing "
+    "each prediction."
 )
 
+st.divider()
+
 
 # =========================================================
-# CUSTOMER INPUTS
+# CUSTOMER PROFILE
 # =========================================================
+
+st.header(
+    "👤 Customer Profile"
+)
+
+st.caption(
+    "Enter demographic, subscription and service information."
+)
+
 
 col1, col2, col3 = st.columns(3)
 
@@ -851,7 +454,6 @@ with col1:
         ]
     )
 
-
     SeniorCitizen = st.selectbox(
         "Senior Citizen",
         [
@@ -859,9 +461,8 @@ with col1:
             1
         ],
         format_func=lambda x:
-            "Yes" if x == 1 else "No"
+        "Yes" if x == 1 else "No"
     )
-
 
     Partner = st.selectbox(
         "Partner",
@@ -871,7 +472,6 @@ with col1:
         ]
     )
 
-
     Dependents = st.selectbox(
         "Dependents",
         [
@@ -879,7 +479,6 @@ with col1:
             "No"
         ]
     )
-
 
     tenure = st.number_input(
         "Tenure (months)",
@@ -904,7 +503,6 @@ with col2:
         ]
     )
 
-
     MultipleLines = st.selectbox(
         "Multiple Lines",
         [
@@ -913,7 +511,6 @@ with col2:
             "No phone service"
         ]
     )
-
 
     InternetService = st.selectbox(
         "Internet Service",
@@ -924,7 +521,6 @@ with col2:
         ]
     )
 
-
     OnlineSecurity = st.selectbox(
         "Online Security",
         [
@@ -934,7 +530,6 @@ with col2:
         ]
     )
 
-
     OnlineBackup = st.selectbox(
         "Online Backup",
         [
@@ -943,7 +538,6 @@ with col2:
             "No internet service"
         ]
     )
-
 
     DeviceProtection = st.selectbox(
         "Device Protection",
@@ -970,7 +564,6 @@ with col3:
         ]
     )
 
-
     StreamingTV = st.selectbox(
         "Streaming TV",
         [
@@ -979,7 +572,6 @@ with col3:
             "No internet service"
         ]
     )
-
 
     StreamingMovies = st.selectbox(
         "Streaming Movies",
@@ -990,7 +582,6 @@ with col3:
         ]
     )
 
-
     Contract = st.selectbox(
         "Contract",
         [
@@ -1000,7 +591,6 @@ with col3:
         ]
     )
 
-
     PaperlessBilling = st.selectbox(
         "Paperless Billing",
         [
@@ -1008,7 +598,6 @@ with col3:
             "No"
         ]
     )
-
 
     PaymentMethod = st.selectbox(
         "Payment Method",
@@ -1022,36 +611,19 @@ with col3:
 
 
 # =========================================================
-# BILLING HEADER
+# BILLING
 # =========================================================
 
-st.markdown(
-    textwrap.dedent(
-        """
-        <div class="section-header">
+st.divider()
 
-            <div class="section-icon">
-                💳
-            </div>
-
-            <div class="section-title">
-                Billing Information
-            </div>
-
-        </div>
-
-        <div class="section-description">
-            Enter the customer's monthly and accumulated billing information.
-        </div>
-        """
-    ),
-    unsafe_allow_html=True
+st.header(
+    "💳 Billing Information"
 )
 
+st.caption(
+    "Enter the customer's monthly and accumulated charges."
+)
 
-# =========================================================
-# BILLING INPUTS
-# =========================================================
 
 billing_col1, billing_col2 = st.columns(2)
 
@@ -1071,25 +643,19 @@ with billing_col2:
     TotalCharges = st.number_input(
         "Total Charges",
         min_value=0.0,
-        value=float(
-            MonthlyCharges * tenure
-        ),
+        value=840.0,
         step=10.0
     )
 
 
 # =========================================================
-# PREDICTION BUTTON
+# ANALYZE BUTTON
 # =========================================================
 
-st.markdown(
-    "<br>",
-    unsafe_allow_html=True
-)
+st.divider()
 
-
-predict_button = st.button(
-    "🔮  Analyze Customer Churn",
+analyze = st.button(
+    "🔮 Analyze Customer Churn",
     type="primary",
     use_container_width=True
 )
@@ -1099,7 +665,7 @@ predict_button = st.button(
 # PREDICTION
 # =========================================================
 
-if predict_button:
+if analyze:
 
     try:
 
@@ -1109,58 +675,63 @@ if predict_button:
 
         customer = create_customer(
 
-            gender=gender,
+            gender,
 
-            SeniorCitizen=SeniorCitizen,
+            SeniorCitizen,
 
-            Partner=Partner,
+            Partner,
 
-            Dependents=Dependents,
+            Dependents,
 
-            tenure=tenure,
+            tenure,
 
-            PhoneService=PhoneService,
+            PhoneService,
 
-            MultipleLines=MultipleLines,
+            MultipleLines,
 
-            InternetService=InternetService,
+            InternetService,
 
-            OnlineSecurity=OnlineSecurity,
+            OnlineSecurity,
 
-            OnlineBackup=OnlineBackup,
+            OnlineBackup,
 
-            DeviceProtection=DeviceProtection,
+            DeviceProtection,
 
-            TechSupport=TechSupport,
+            TechSupport,
 
-            StreamingTV=StreamingTV,
+            StreamingTV,
 
-            StreamingMovies=StreamingMovies,
+            StreamingMovies,
 
-            Contract=Contract,
+            Contract,
 
-            PaperlessBilling=PaperlessBilling,
+            PaperlessBilling,
 
-            PaymentMethod=PaymentMethod,
+            PaymentMethod,
 
-            MonthlyCharges=MonthlyCharges,
+            MonthlyCharges,
 
-            TotalCharges=TotalCharges
+            TotalCharges
         )
 
 
         # -------------------------------------------------
-        # MODEL PREDICTION
+        # PREDICTION
         # -------------------------------------------------
 
-        prediction = best_model.predict(
-            customer
-        )[0]
+        prediction = (
+            best_model.predict(
+                customer
+            )[0]
+        )
 
 
-        probability = best_model.predict_proba(
-            customer
-        )[0, 1]
+        probability = (
+            best_model
+            .predict_proba(
+                customer
+            )[0, 1]
+        )
 
 
         stay_probability = (
@@ -1169,220 +740,106 @@ if predict_button:
 
 
         # =================================================
-        # PREDICTION SUMMARY
+        # RESULT
         # =================================================
 
-        st.markdown(
-            textwrap.dedent(
-                """
-                <div class="section-header">
+        st.divider()
 
-                    <div class="section-icon">
-                        📊
-                    </div>
-
-                    <div class="section-title">
-                        Prediction Summary
-                    </div>
-
-                </div>
-                """
-            ),
-            unsafe_allow_html=True
+        st.header(
+            "📈 Prediction Result"
         )
 
 
-        # -------------------------------------------------
-        # KPI 1
-        # -------------------------------------------------
-
-        kpi1, kpi2, kpi3 = st.columns(3)
+        result1, result2, result3 = (
+            st.columns(3)
+        )
 
 
-        with kpi1:
+        with result1:
 
             if prediction == 1:
 
-                prediction_text = "CHURN"
-                prediction_icon = "⚠️"
+                st.metric(
+                    "Prediction",
+                    "⚠️ CHURN"
+                )
 
             else:
 
-                prediction_text = "STAY"
-                prediction_icon = "✓"
+                st.metric(
+                    "Prediction",
+                    "✅ STAY"
+                )
 
 
-            st.markdown(
-                textwrap.dedent(
-                    f"""
-                    <div class="kpi-card">
+        with result2:
 
-                        <div class="kpi-label">
-                            Prediction
-                        </div>
-
-                        <div class="kpi-value">
-                            {prediction_icon} {prediction_text}
-                        </div>
-
-                        <div class="kpi-small">
-                            Model classification
-                        </div>
-
-                    </div>
-                    """
-                ),
-                unsafe_allow_html=True
+            st.metric(
+                "Churn Probability",
+                f"{probability:.2%}"
             )
 
 
-        # -------------------------------------------------
-        # KPI 2
-        # -------------------------------------------------
+        with result3:
 
-        with kpi2:
-
-            st.markdown(
-                textwrap.dedent(
-                    f"""
-                    <div class="kpi-card">
-
-                        <div class="kpi-label">
-                            Churn Probability
-                        </div>
-
-                        <div class="kpi-value">
-                            {probability:.1%}
-                        </div>
-
-                        <div class="kpi-small">
-                            Estimated probability
-                        </div>
-
-                    </div>
-                    """
-                ),
-                unsafe_allow_html=True
-            )
-
-
-        # -------------------------------------------------
-        # KPI 3
-        # -------------------------------------------------
-
-        with kpi3:
-
-            st.markdown(
-                textwrap.dedent(
-                    f"""
-                    <div class="kpi-card">
-
-                        <div class="kpi-label">
-                            Stay Probability
-                        </div>
-
-                        <div class="kpi-value">
-                            {stay_probability:.1%}
-                        </div>
-
-                        <div class="kpi-small">
-                            Estimated retention probability
-                        </div>
-
-                    </div>
-                    """
-                ),
-                unsafe_allow_html=True
+            st.metric(
+                "Stay Probability",
+                f"{stay_probability:.2%}"
             )
 
 
         # =================================================
-        # RISK ASSESSMENT
+        # RISK MESSAGE
         # =================================================
+
+        st.subheader(
+            "Risk Assessment"
+        )
+
 
         if probability >= 0.50:
 
-            risk_text = "Higher Churn Risk"
-            risk_class = "risk-high"
+            st.error(
+                f"⚠️ Higher churn risk — "
+                f"estimated probability: "
+                f"{probability:.2%}"
+            )
 
         else:
 
-            risk_text = "Lower Churn Risk"
-            risk_class = "risk-low"
+            st.success(
+                f"✅ Lower churn risk — "
+                f"estimated probability: "
+                f"{probability:.2%}"
+            )
 
 
-        progress_width = (
-            probability * 100
-        )
-
-
-        st.markdown(
-            textwrap.dedent(
-                f"""
-                <div class="risk-card">
-
-                    <div class="risk-title">
-                        Risk Assessment
-                    </div>
-
-                    <div class="risk-value {risk_class}">
-                        {risk_text}
-                    </div>
-
-                    <div class="kpi-small">
-                        Churn probability: {probability:.1%}
-                    </div>
-
-                    <div class="progress-container">
-
-                        <div
-                            class="progress-bar"
-                            style="width:{progress_width:.2f}%"
-                        ></div>
-
-                    </div>
-
-                </div>
-                """
-            ),
-            unsafe_allow_html=True
+        st.progress(
+            float(probability)
         )
 
 
         # =================================================
-        # SHAP EXPLANATION HEADER
+        # SHAP EXPLANATION
         # =================================================
 
-        st.markdown(
-            textwrap.dedent(
-                """
-                <div class="section-header">
+        st.divider()
 
-                    <div class="section-icon">
-                        🔍
-                    </div>
-
-                    <div class="section-title">
-                        Prediction Explanation
-                    </div>
-
-                </div>
-
-                <div class="section-description">
-                    SHAP explains which features contributed
-                    to this individual prediction.
-                </div>
-                """
-            ),
-            unsafe_allow_html=True
+        st.header(
+            "🔍 Prediction Explanation"
         )
 
+        st.caption(
+            "SHAP identifies which features contributed "
+            "toward or against the churn prediction."
+        )
 
-        # =================================================
-        # SHAP
-        # =================================================
 
         if explainer is not None:
+
+            # ---------------------------------------------
+            # TRANSFORM CUSTOMER
+            # ---------------------------------------------
 
             customer_transformed = (
                 preprocessor.transform(
@@ -1391,6 +848,10 @@ if predict_button:
             )
 
 
+            # ---------------------------------------------
+            # SHAP
+            # ---------------------------------------------
+
             customer_shap = (
                 explainer.shap_values(
                     customer_transformed
@@ -1398,9 +859,14 @@ if predict_button:
             )
 
 
-            # -------------------------------------------------
+            shap_array = np.asarray(
+                customer_shap
+            )
+
+
+            # ---------------------------------------------
             # HANDLE SHAP OUTPUT
-            # -------------------------------------------------
+            # ---------------------------------------------
 
             if isinstance(
                 customer_shap,
@@ -1410,30 +876,37 @@ if predict_button:
                 if len(customer_shap) > 1:
 
                     shap_values = (
-                        customer_shap[1][0]
+                        np.asarray(
+                            customer_shap[1]
+                        )[0]
                     )
 
                 else:
 
                     shap_values = (
-                        customer_shap[0][0]
+                        np.asarray(
+                            customer_shap[0]
+                        )[0]
                     )
 
+            elif shap_array.ndim == 3:
 
-            elif len(
-                np.asarray(
-                    customer_shap
-                ).shape
-            ) == 3:
+                # (samples, features, classes)
 
                 shap_values = (
-                    customer_shap[0, :, 1]
+                    shap_array[0, :, 1]
+                )
+
+            elif shap_array.ndim == 2:
+
+                shap_values = (
+                    shap_array[0]
                 )
 
             else:
 
                 shap_values = (
-                    customer_shap[0]
+                    shap_array.flatten()
                 )
 
 
@@ -1442,9 +915,9 @@ if predict_button:
             ).flatten()
 
 
-            # -------------------------------------------------
+            # ---------------------------------------------
             # FEATURE NAMES
-            # -------------------------------------------------
+            # ---------------------------------------------
 
             feature_names = (
                 preprocessor
@@ -1452,9 +925,33 @@ if predict_button:
             )
 
 
-            # -------------------------------------------------
-            # SHAP DATAFRAME
-            # -------------------------------------------------
+            # ---------------------------------------------
+            # SAFETY CHECK
+            # ---------------------------------------------
+
+            min_length = min(
+                len(feature_names),
+                len(shap_values)
+            )
+
+
+            feature_names = (
+                feature_names[
+                    :min_length
+                ]
+            )
+
+
+            shap_values = (
+                shap_values[
+                    :min_length
+                ]
+            )
+
+
+            # ---------------------------------------------
+            # DATAFRAME
+            # ---------------------------------------------
 
             shap_df = pd.DataFrame(
                 {
@@ -1467,16 +964,12 @@ if predict_button:
             )
 
 
-            shap_df["Impact"] = np.where(
-                shap_df["SHAP Value"] > 0,
-                "Increases Churn Risk",
-                "Reduces Churn Risk"
-            )
-
-
-            shap_df["Absolute Impact"] = (
-                shap_df["SHAP Value"]
-                .abs()
+            shap_df[
+                "Absolute Impact"
+            ] = (
+                shap_df[
+                    "SHAP Value"
+                ].abs()
             )
 
 
@@ -1490,9 +983,9 @@ if predict_button:
             )
 
 
-            # -------------------------------------------------
-            # PLOT DATA
-            # -------------------------------------------------
+            # ---------------------------------------------
+            # PLOT
+            # ---------------------------------------------
 
             plot_df = (
                 shap_df
@@ -1502,87 +995,56 @@ if predict_button:
             )
 
 
-            # -------------------------------------------------
-            # CREATE PLOT
-            # -------------------------------------------------
-
             fig, ax = plt.subplots(
-                figsize=(10, 6)
+                figsize=(11, 6)
             )
 
 
-            bars = ax.barh(
+            colors = [
+
+                "#dc2626"
+                if value > 0
+                else "#2563eb"
+
+                for value
+                in plot_df["SHAP Value"]
+
+            ]
+
+
+            ax.barh(
                 plot_df["Feature"],
-                plot_df["SHAP Value"]
+                plot_df["SHAP Value"],
+                color=colors
             )
 
-
-            # -------------------------------------------------
-            # BAR COLORS
-            # -------------------------------------------------
-
-            for bar, value in zip(
-                bars,
-                plot_df["SHAP Value"]
-            ):
-
-                if value >= 0:
-
-                    bar.set_color(
-                        "#dc2626"
-                    )
-
-                else:
-
-                    bar.set_color(
-                        "#2563eb"
-                    )
-
-
-            # -------------------------------------------------
-            # ZERO LINE
-            # -------------------------------------------------
 
             ax.axvline(
                 0,
-                linewidth=1.2,
-                color="#475569"
+                color="#475569",
+                linewidth=1
             )
 
 
-            # -------------------------------------------------
-            # TITLE
-            # -------------------------------------------------
-
             ax.set_title(
-                "Top Factors Influencing Churn Prediction",
-                fontsize=15,
+                "Top Factors Influencing Churn",
+                fontsize=16,
                 fontweight="bold",
-                pad=15,
-                color="#172033"
+                pad=15
             )
 
 
             ax.set_xlabel(
-                "SHAP Contribution",
-                fontsize=10
+                "SHAP Contribution"
             )
 
-
-            # -------------------------------------------------
-            # GRID
-            # -------------------------------------------------
 
             ax.grid(
                 axis="x",
-                alpha=0.2,
-                linestyle="--"
+                linestyle="--",
+                alpha=0.20
             )
 
-
-            # -------------------------------------------------
-            # SPINES
-            # -------------------------------------------------
 
             ax.spines[
                 "top"
@@ -1597,57 +1059,51 @@ if predict_button:
             ].set_visible(False)
 
 
-            # -------------------------------------------------
+            # ---------------------------------------------
             # VALUE LABELS
-            # -------------------------------------------------
+            # ---------------------------------------------
 
-            for bar, value in zip(
-                bars,
+            max_abs = max(
+                abs(
+                    plot_df[
+                        "SHAP Value"
+                    ]
+                )
+            )
+
+
+            for index, value in enumerate(
                 plot_df["SHAP Value"]
             ):
 
-                if value >= 0:
-
-                    x_position = value
-                    ha = "left"
-
-                else:
-
-                    x_position = value
-                    ha = "right"
-
-
-                ax.text(
-
-                    x_position,
-
-                    bar.get_y()
-                    + bar.get_height() / 2,
-
-                    f"{value:+.3f}",
-
-                    va="center",
-
-                    ha=ha,
-
-                    fontsize=9,
-
-                    color="#334155"
-
+                offset = (
+                    max_abs * 0.02
                 )
 
 
+                if value >= 0:
+
+                    ax.text(
+                        value + offset,
+                        index,
+                        f"{value:+.3f}",
+                        va="center",
+                        fontsize=9
+                    )
+
+                else:
+
+                    ax.text(
+                        value - offset,
+                        index,
+                        f"{value:+.3f}",
+                        va="center",
+                        ha="right",
+                        fontsize=9
+                    )
+
+
             plt.tight_layout()
-
-
-            # -------------------------------------------------
-            # DISPLAY SHAP
-            # -------------------------------------------------
-
-            st.markdown(
-                '<div class="shap-card">',
-                unsafe_allow_html=True
-            )
 
 
             st.pyplot(
@@ -1656,34 +1112,19 @@ if predict_button:
             )
 
 
-            st.markdown(
-                textwrap.dedent(
-                    """
-                    <div class="info-card">
-
-                        <div class="info-title">
-                            How to read this chart
-                        </div>
-
-                        <div class="info-text">
-                            Red features push the prediction
-                            toward higher churn risk.
-                            Blue features push the prediction
-                            toward lower churn risk.
-                            Larger absolute SHAP values indicate
-                            stronger influence on this prediction.
-                        </div>
-
-                    </div>
-                    """
-                ),
-                unsafe_allow_html=True
-            )
+            plt.close(fig)
 
 
-            st.markdown(
-                "</div>",
-                unsafe_allow_html=True
+            # ---------------------------------------------
+            # LEGEND
+            # ---------------------------------------------
+
+            st.info(
+                "🔴 Positive SHAP values increase the "
+                "model's churn output. "
+                "🔵 Negative SHAP values decrease it. "
+                "Larger absolute values indicate stronger "
+                "model influence."
             )
 
 
@@ -1692,29 +1133,37 @@ if predict_button:
             # =================================================
 
             with st.expander(
-                "📋 View Detailed Feature Contributions"
+                "📋 View Detailed SHAP Contributions"
             ):
 
-                display_df = shap_df[
+                table_df = shap_df[
                     [
                         "Feature",
-                        "SHAP Value",
-                        "Impact"
+                        "SHAP Value"
                     ]
                 ].copy()
 
 
-                display_df[
-                    "SHAP Value"
-                ] = (
-                    display_df[
+                table_df[
+                    "Direction"
+                ] = np.where(
+                    table_df[
                         "SHAP Value"
-                    ].round(4)
+                    ] > 0,
+                    "Increases Churn",
+                    "Reduces Churn"
                 )
 
 
+                table_df[
+                    "SHAP Value"
+                ] = table_df[
+                    "SHAP Value"
+                ].round(4)
+
+
                 st.dataframe(
-                    display_df,
+                    table_df,
                     use_container_width=True,
                     hide_index=True
                 )
@@ -1723,35 +1172,27 @@ if predict_button:
         else:
 
             st.warning(
-                "SHAP explanation is currently unavailable."
+                "SHAP explanation is unavailable."
             )
 
 
         # =================================================
-        # ENGINEERED FEATURES
+        # CUSTOMER DATA
         # =================================================
+
+        st.divider()
 
         with st.expander(
-            "🧮 View Engineered Customer Features"
+            "👤 View Customer Input & Engineered Features"
         ):
 
-            engineered_df = (
-                customer
-                .T
-                .reset_index()
-            )
-
-
-            engineered_df.columns = [
-                "Feature",
-                "Value"
-            ]
-
-
             st.dataframe(
-                engineered_df,
-                use_container_width=True,
-                hide_index=True
+                customer.T.rename(
+                    columns={
+                        0: "Value"
+                    }
+                ),
+                use_container_width=True
             )
 
 
@@ -1760,61 +1201,55 @@ if predict_button:
         # =================================================
 
         with st.expander(
-            "🤖 View Model Information"
+            "🤖 Model Information"
         ):
 
-            model_col1, model_col2 = (
-                st.columns(2)
-            )
+            info1, info2 = st.columns(2)
 
 
-            with model_col1:
+            with info1:
 
-                st.markdown(
-                    """
-                    **Model**
-
-                    XGBoost Classification
-                    """
+                st.write(
+                    "**Algorithm:** XGBoost"
                 )
 
-                st.markdown(
-                    """
-                    **Preprocessing**
+                st.write(
+                    "**Preprocessing:** "
+                    "ColumnTransformer"
+                )
 
-                    Numerical scaling + categorical encoding
-                    """
+                st.write(
+                    "**Feature Engineering:** "
+                    "AvgChargesPerMonth, "
+                    "TenureGroup, NumServices"
                 )
 
 
-            with model_col2:
+            with info2:
 
-                st.markdown(
-                    """
-                    **Explainability**
-
-                    SHAP TreeExplainer
-                    """
+                st.write(
+                    "**Explainability:** SHAP"
                 )
 
-                st.markdown(
-                    """
-                    **Input**
+                st.write(
+                    "**Prediction Type:** "
+                    "Binary Classification"
+                )
 
-                    22 raw/engineered customer features
-                    """
+                st.write(
+                    "**Output:** Churn Probability"
                 )
 
 
     except Exception as e:
 
         st.error(
-            "An error occurred while generating the prediction."
+            "Something went wrong while "
+            "generating the prediction."
         )
 
-
         with st.expander(
-            "View technical details"
+            "Technical Details"
         ):
 
             st.code(
@@ -1826,17 +1261,9 @@ if predict_button:
 # FOOTER
 # =========================================================
 
-st.markdown(
-    textwrap.dedent(
-        """
-        <div class="footer">
+st.divider()
 
-            ChurnIQ • Customer Churn Prediction System
-            <br>
-            Built with Python • Streamlit • XGBoost • SHAP
-
-        </div>
-        """
-    ),
-    unsafe_allow_html=True
+st.caption(
+    "ChurnIQ • Customer Churn Prediction System • "
+    "Python • Streamlit • XGBoost • SHAP"
 )
