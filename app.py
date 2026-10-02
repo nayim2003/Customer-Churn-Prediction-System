@@ -1215,84 +1215,80 @@ if predict_button:
         # STYLE SHAP FIGURE
         # =============================================
 
-        ax = plt.gca()
+        
+                fig, ax = plt.subplots(
+                    figsize=(12, 6)
+                )
 
 
-        ax.set_facecolor(
-            "#111827"
-        )
+                fig.patch.set_facecolor(
+                    "#111827"
+                )
+
+                ax.set_facecolor(
+                    "#111827"
+                )
 
 
-        fig.patch.set_facecolor(
-            "#111827"
-        )
+                plot_importance = (
+                    importance_df
+                    .sort_values(
+                        "Importance"
+                    )
+                )
 
 
-        # Axis labels
-
-        ax.tick_params(
-            colors="#e2e8f0"
-        )
-
-
-        for label in ax.get_xticklabels():
-
-            label.set_color(
-                "#cbd5e1"
-            )
+                ax.barh(
+                    plot_importance[
+                        "Feature"
+                    ],
+                    plot_importance[
+                        "Importance"
+                    ],
+                    color="#3b82f6"
+                )
 
 
-        for label in ax.get_yticklabels():
-
-            label.set_color(
-                "#f8fafc"
-            )
-
-
-        ax.set_title(
-            "SHAP Explanation — Customer Churn Prediction",
-            color="#f8fafc",
-            fontsize=16,
-            fontweight="bold",
-            pad=15
-        )
+                ax.set_title(
+                    "Model Feature Importance",
+                    color="#f8fafc",
+                    fontsize=17,
+                    fontweight="bold",
+                    fontfamily="Times New Roman"
+                )
 
 
-        # Spines
-
-        ax.spines[
-            "top"
-        ].set_visible(False)
-
-        ax.spines[
-            "right"
-        ].set_visible(False)
+                ax.tick_params(
+                    colors="#e2e8f0"
+                )
 
 
-        ax.spines[
-            "left"
-        ].set_color(
-            "#334155"
-        )
+                ax.spines[
+                    "top"
+                ].set_visible(False)
 
-        ax.spines[
-            "bottom"
-        ].set_color(
-            "#334155"
-        )
+                ax.spines[
+                    "right"
+                ].set_visible(False)
 
+                ax.spines[
+                    "left"
+                ].set_visible(False)
 
-        plt.tight_layout()
-
-
-        st.pyplot(
-            fig,
-            use_container_width=True
-        )
+                ax.spines[
+                    "bottom"
+                ].set_color(
+                    "#334155"
+                )
 
 
-        plt.close(fig)
+                plt.tight_layout()
 
+
+                st.pyplot(
+                    fig,
+                    use_container_width=True
+                )
 
         st.caption(
             "Positive SHAP contributions push the model "
