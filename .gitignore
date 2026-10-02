@@ -1,0 +1,10 @@
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
+.env
+models/*.pkl
+data/raw/*
+data/processed/*
+outputs/figures/*
+outputs/tables/*
+outputs/predictions/*
