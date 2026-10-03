@@ -32,6 +32,7 @@ telco-customer-churn/
 │   └── scaler.pkl
 ├── app.py
 └── reports/
+    ├── Telco_Customer_Churn_Report_With_Actual_Graphs_and_Interpretations
     └── Telco_Customer_Churn_Report.md
 ```
 
@@ -145,6 +146,9 @@ The notebook reloads the bundle and verifies the constructed customer's predicti
 **Project:** Customer Churn Prediction System using the IBM Telco Customer Churn dataset  
 **Model:** Tuned XGBoost  
 **Decision threshold:** 0.45
+
+**See full Report:
+- [`Reports/Telco_Customer_Churn_Report_With_Actual_Graphs_and_Interpretations.pdf`](Reports/Telco_Customer_Churn_Report_With_Actual_Graphs_and_Interpretations.pdf)
 
 ------------------
 # ***Md. Nayim Howlader***
