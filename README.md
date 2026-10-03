@@ -147,7 +147,7 @@ The notebook reloads the bundle and verifies the constructed customer's predicti
 **Model:** Tuned XGBoost  
 **Decision threshold:** 0.45
 
-**See full Report:
+# **See full Report:**
 - [`Reports/Telco_Customer_Churn_Report_With_Actual_Graphs_and_Interpretations.pdf`](Reports/Telco_Customer_Churn_Report_With_Actual_Graphs_and_Interpretations.pdf)
 
 ------------------
